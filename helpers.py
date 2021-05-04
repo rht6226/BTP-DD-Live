@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics import roc_curve, roc_auc_score, accuracy_score, classification_report, confusion_matrix, f1_score, recall_score, precision_score
+import playsound
 
 
 
@@ -42,4 +43,14 @@ def average(y_pred):
         y_pred[i] = 0
   return y_pred
 
+
+def get_average_prediction(results):
+  sum = 0.0
+  for r in results:
+        sum = sum + float(r)
+  average = sum / len(results)
+  if average >= 0.5:
+        return "Drowsy"
+  else:
+        return "Alert"
 

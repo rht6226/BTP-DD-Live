@@ -18,8 +18,8 @@ def calibration():
 
     data = []
     cap = cv2.VideoCapture(0)
-    cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('image', (1280,720))
+    cv2.namedWindow('Calibration', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('Calibration', (1280,720))
 
     while True:
         # Getting out image by webcam 
@@ -36,20 +36,19 @@ def calibration():
             shape = predictor(gray, rect)
             shape = face_utils.shape_to_np(shape)
             data.append(shape)
-            cv2.putText(image,"Calibrating...", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,139), 2)
-            cv2.putText(image,"Press ESC to end callibration...", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,99,71), 2)
+            cv2.putText(image,"Calibrating...", (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (140,0,0), 2)
+            cv2.putText(image,"Press q to end callibration...", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,140), 2)
 
             # Draw on our image, all the finded cordinate points (x,y) 
             for (x, y) in shape:
                 cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
 
         # Show the image
-        cv2.imshow("image", image)
+        cv2.imshow("Calibration", image)
         
 
-        k = cv2.waitKey(500) & 0xFF
-        if k == 27:
-            break
+        if cv2.waitKey(1) == ord("q"):
+                break
 
     cv2.destroyAllWindows()
     cap.release()

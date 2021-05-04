@@ -5,6 +5,7 @@ import pandas as pd
 import time
 from imutils import face_utils
 from features import eye_aspect_ratio, mouth_aspect_ratio, circularity, mouth_over_eye
+from helpers import get_average_prediction
 from load_model import model
 
 def live(mean, std):
@@ -16,11 +17,11 @@ def live(mean, std):
 
     # Enable webcam
     cap = cv2.VideoCapture(0)
-    cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('image', (1280,720))
+    cv2.namedWindow('DrowsinessDetector', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('DrowsinessDetector', (1280,720))
 
-    data = []
-    result = []
+    data_list = []
+    result_list = []
     while True:
         # Getting out image by webcam 
         _, image = cap.read()
@@ -33,31 +34,42 @@ def live(mean, std):
         # For each detected face, find the landmark.
         for (i, rect) in enumerate(rects):
             # Make the prediction and transfom it to numpy array
-            shape = predictor(gray, rect)
-            shape = face_utils.shape_to_np(shape)
-            Result_String, features = model(shape, mean, std)
+
+            results = []
+            feature_list = []
+
+            for _ in range(3):
+                shape = predictor(gray, rect)
+                shape = face_utils.shape_to_np(shape)
+                result, features = model(shape, mean, std)
+                results.append(result)
+                feature_list.append(features)
+
+            Result_String = get_average_prediction(results)
 
             
-            
-            cv2.putText(image,Result_String, (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 136),2)
-            cv2.putText(image,"Press ESC to end program...", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,99,71), 2)
+            if Result_String == "Alert":
+                cv2.putText(image,Result_String, (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,150,0),2)
+            else:
+                cv2.putText(image,Result_String, (10, 400), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 150),2)
 
-            data.append (features)
-            result.append(Result_String)
+            cv2.putText(image,"Press q to quit program...", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,99,71), 2)
+
+            data_list.append (feature_list)
+            result_list.append(Result_String)
 
             # Draw on our image, all the finded cordinate points (x,y) 
             for (x, y) in shape:
-                cv2.circle(image, (x, y), 2, (0, 255, 0), -1)
+                cv2.circle(image, (x, y), 2, (139, 0, 0), -1)
 
         # Show the image
-        cv2.imshow("image", image)
+        cv2.imshow("DrowsinessDetector", image)
 
-        k = cv2.waitKey(3000) & 0xFF
-        if k == 27:
-            break
+        if cv2.waitKey(1) == ord("q"):
+                break
 
     cv2.destroyAllWindows()
     cap.release()
     
-    return data,result
+    return data_list,result_list
 
