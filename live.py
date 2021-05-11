@@ -5,6 +5,7 @@ import pandas as pd
 import time
 from imutils import face_utils
 from features import eye_aspect_ratio, mouth_aspect_ratio, circularity, mouth_over_eye
+from load_ensemble import ensemble_model
 from helpers import get_average_prediction
 from load_model import model
 
@@ -42,6 +43,7 @@ def live(mean, std):
                 shape = predictor(gray, rect)
                 shape = face_utils.shape_to_np(shape)
                 result, features = model(shape, mean, std)
+                # result, features = ensemble_model(shape, mean, std)
                 results.append(result)
                 feature_list.append(features)
 
